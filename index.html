@@ -10,6 +10,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            position: relative;
         }
         .modal {
             display: none; /* Oculto por defecto */
@@ -92,6 +93,7 @@
         .error {
             color: red;
             margin-top: 10px;
+            display: none;
         }
         .whatsapp-logo {
             width: 50px;
@@ -114,6 +116,7 @@
         <div class="modal-content">
             <h2>RECARGAS TV NACIONALES E INTERNACIONALES</h2>
             <button class="button" onclick="continueToDataModal()">CONTINUAR</button>
+            <button class="button" onclick="goToVendeYGana()">Volver a vende y gana</button>
         </div>
     </div>
 
@@ -161,7 +164,8 @@
             <h2>Recarga Directv</h2>
             <div class="form-group">
                 <label for="tarjeta">Número de Tarjeta:</label>
-                <input type="text" id="tarjeta" name="tarjeta" pattern="\d*" title="Solo números" required>
+                <input type="text" id="tarjeta" name="tarjeta" pattern="00\d{10,}" title="Debe comenzar con dos ceros y tener al menos 12 dígitos" required oninput="validateTarjeta()">
+                <div class="error" id="tarjetaError">El número de tarjeta debe comenzar con dos ceros y tener al menos 12 dígitos.</div>
             </div>
             <div class="form-group">
                 <label for="monto">Monto a Recargar en Pesos:</label>
@@ -227,7 +231,7 @@
             90000: 1632.00,
             100000: 1810.00
         };
-        const minRecarga = 10000; // Mínima recarga en pesos
+        let minRecarga = 10000; // Mínima recarga en pesos
 
         // Obtener los precios actualizados desde el servidor (si se necesita)
         fetch('http://localhost:3000/api/precios')
@@ -310,6 +314,19 @@
             document.getElementById('directvModal').style.display = 'flex';
         }
 
+        // Función para validar el número de tarjeta
+        function validateTarjeta() {
+            const tarjeta = document.getElementById('tarjeta').value;
+            const errorDiv = document.getElementById('tarjetaError');
+            
+            // Verificar si el número de tarjeta cumple con los requisitos
+            if (/^00\d{10,}$/.test(tarjeta)) {
+                errorDiv.style.display = 'none';
+            } else {
+                errorDiv.style.display = 'block';
+            }
+        }
+
         // Función para convertir pesos a bolívares
         function convertToBs() {
             const monto = parseInt(document.getElementById('monto').value, 10);
@@ -336,8 +353,9 @@
 
             if (monto < minRecarga) {
                 errorDiv.textContent = 'La recarga mínima es de ' + minRecarga + ' pesos.';
+                errorDiv.style.display = 'block';
             } else {
-                errorDiv.textContent = '';
+                errorDiv.style.display = 'none';
                 closeModal('directvModal');
 
                 // Mostrar el resumen
@@ -376,6 +394,11 @@
 
             const whatsappUrl = `https://wa.me/+584247388620?text=${encodeURIComponent(mensaje)}`;
             window.open(whatsappUrl, '_blank');
+        }
+
+        // Función para volver a la página principal
+        function goToVendeYGana() {
+            window.location.href = 'https://www.vendeygana.net';
         }
 
         // Cerrar el modal si el usuario hace clic fuera de él
