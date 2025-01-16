@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RECARGAS TV NACIONALES E INTERNACIONALES</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 20px;
+            border: 5px solid orange; /* Marco color naranja más grueso */
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: orange;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 200px;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-button {
+            width: 100%; /* Ancho del botón */
+            max-width: 150px; /* Limita el ancho máximo */
+            height: 80px; /* Altura del botón */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra del fondo */
+            transition: box-shadow 0.3s ease;
+        }
+        .logo-button:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra al pasar el ratón */
+        }
+        .logo-button img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .whatsapp-logo {
+            width: 50px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            .modal-content {
+                width: 95%;
+                padding: 10px;
+            }
+            .button {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal 1 -->
+    <div id="initialModal" class="modal">
+        <div class="modal-content">
+            <h2>RECARGAS TV NACIONALES E INTERNACIONALES</h2>
+            <button class="button" onclick="continueToDataModal()">CONTINUAR</button>
+        </div>
+    </div>
+
+    <!-- Modal 2 -->
+    <div id="dataModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('dataModal')">&times;</span>
+            <img src="https://www.vendeygana.net/assets/img/logo-blanco-1.png" alt="Logo" style="width: 150px; margin-bottom: 20px;">
+            <h2>Por favor, llene los siguientes datos</h2>
+            <div class="form-group">
+                <label for="cedula">Cédula:</label>
+                <input type="text" id="cedula" name="cedula" pattern="\d*" title="Solo números" required>
+            </div>
+            <div class="form-group">
+                <label for="correo">Correo:</label>
+                <input type="email" id="correo" name="correo" required>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" pattern="\d{11}" title="11 números" required>
+            </div>
+            <div class="form-group">
+                <button class="button" onclick="saveDataAndNextModal()">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3 -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('serviceModal')">&times;</span>
+            <h2>RECARGAS TV NACIONALES E INTERNACIONALES</h2>
+            <div class="button-container">
+                <button class="logo-button" onclick="showDirectvForm()">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFJTapc45lBWfmtpAnlqzfmnzyGFw_Sj433g&s" alt="Directv Logo">
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 4 (Directv Form) -->
+    <div id="directvModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('directvModal')">&times;</span>
+            <h2>Recarga Directv</h2>
+            <div class="form-group">
+                <label for="tarjeta">Número de Tarjeta:</label>
+                <input type="text" id="tarjeta" name="tarjeta" pattern="\d*" title="Solo números" required>
+            </div>
+            <div class="form-group">
+                <label for="monto">Monto a Recargar en Pesos:</label>
+                <input type="number" id="monto" name="monto" oninput="convertToBs()" required>
+            </div>
+            <div class="form-group">
+                <label for="costo">Costo en BS:</label>
+                <input type="text" id="costo" name="costo" readonly>
+            </div>
+            <div class="error" id="error"></div>
+            <div class="form-group">
+                <button class="button" onclick="showSummary()">Recargar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 5 (Summary) -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('summaryModal')">&times;</span>
+            <h2>Resumen de la Operación</h2>
+            <p id="resumen"></p>
+            <p>¿Seguro que deseas realizar la siguiente operación?</p>
+            <div class="button-container">
+                <button class="button" onclick="processRecarga()">Procesar</button>
+                <button class="button" onclick="correctDatos()">Corregir Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 6 (WhatsApp Confirmation) -->
+    <div id="whatsappModal" class="modal">
+        <div class="modal-content">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo" class="whatsapp-logo">
+            <h2>Recarga a través de WhatsApp</h2>
+            <p>El mensaje será enviado a través de WhatsApp.</p>
+            <div class="button-container">
+                <button class="button" onclick="sendWhatsAppMessage()">Enviar Mensaje</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const conversionTable = {
+            1000: 18.00,
+            2000: 36.00,
+            3000: 54.00,
+            4000: 72.00,
+            5000: 90.00,
+            6000: 108.00,
+            7000: 126.00,
+            8000: 144.00,
+            9000: 162.00,
+            10000: 194.00,
+            20000: 374.00,
+            30000: 554.00,
+            40000: 734.00,
+            50000: 914.00,
+            60000: 1092.00,
+            70000: 1272.00,
+            80000: 1452.00,
+            90000: 1632.00,
+            100000: 1810.00
+        };
+        const minRecarga = 10000; // Mínima recarga en pesos
+
+        // Obtener los precios actualizados desde el servidor (si se necesita)
+        fetch('http://localhost:3000/api/precios')
+            .then(response => response.json())
+            .then(data => {
+                // Aquí podría actualizar la tabla de conversión si los datos vienen del servidor
+                // conversionTable = data.conversionTable;
+                minRecarga = data.minRecarga;
+            })
+            .catch(error => {
+                console.error('Error obteniendo los precios:', error);
+            });
+
+        // Función para abrir el modal inicial automáticamente al cargar la página
+        window.onload = function() {
+            if (!localStorage.getItem('cedula') || !localStorage.getItem('correo') || !localStorage.getItem('telefono')) {
+                document.getElementById('initialModal').style.display = 'flex';
+            } else {
+                document.getElementById('serviceModal').style.display = 'flex';
+            }
+        };
+
+        // Función para cerrar un modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Función para continuar al modal de datos
+        function continueToDataModal() {
+            document.getElementById('initialModal').style.display = 'none';
+            document.getElementById('dataModal').style.display = 'flex';
+
+            // Cargar datos guardados si existen
+            if (localStorage.getItem('cedula')) {
+                document.getElementById('cedula').value = localStorage.getItem('cedula');
+            }
+            if (localStorage.getItem('correo')) {
+                document.getElementById('correo').value = localStorage.getItem('correo');
+            }
+            if (localStorage.getItem('telefono')) {
+                document.getElementById('telefono').value = localStorage.getItem('telefono');
+            }
+        }
+
+        // Función para pasar al modal de servicios
+        function saveDataAndNextModal() {
+            // Validar cédula
+            const cedula = document.getElementById('cedula').value;
+            if (!/^\d+$/.test(cedula)) {
+                alert('La cédula debe contener solo números.');
+                return;
+            }
+
+            // Validar correo
+            const correo = document.getElementById('correo').value;
+            if (!/\S+@\S+\.\S+/.test(correo)) {
+                alert('El correo debe ser válido y contener un @.');
+                return;
+            }
+
+            // Validar teléfono
+            const telefono = document.getElementById('telefono').value;
+            if (!/^\d{11}$/.test(telefono)) {
+                alert('El teléfono debe contener 11 números.');
+                return;
+            }
+
+            // Guardar los datos en localStorage
+            localStorage.setItem('cedula', cedula);
+            localStorage.setItem('correo', correo);
+            localStorage.setItem('telefono', telefono);
+
+            closeModal('dataModal');
+            document.getElementById('serviceModal').style.display = 'flex';
+        }
+
+        // Función para mostrar el formulario de Directv
+        function showDirectvForm() {
+            closeModal('serviceModal');
+            document.getElementById('directvModal').style.display = 'flex';
+        }
+
+        // Función para convertir pesos a bolívares
+        function convertToBs() {
+            const monto = parseInt(document.getElementById('monto').value, 10);
+            let costo = 0;
+
+            // Descomponer el monto en múltiplos de 10,000 y 1,000
+            const multiplesDeDiezMil = Math.floor(monto / 10000) * 10000;
+            const multiplesDeMil = monto % 10000;
+
+            if (multiplesDeDiezMil in conversionTable) {
+                costo += conversionTable[multiplesDeDiezMil];
+            }
+            if (multiplesDeMil in conversionTable) {
+                costo += conversionTable[multiplesDeMil];
+            }
+
+            document.getElementById('costo').value = `${costo.toFixed(2)} BS`; // Mostrar en formato de 2 decimales
+        }
+
+        // Función para mostrar el resumen de la operación de Directv
+        function showSummary() {
+            const monto = parseInt(document.getElementById('monto').value, 10);
+            const errorDiv = document.getElementById('error');
+
+            if (monto < minRecarga) {
+                errorDiv.textContent = 'La recarga mínima es de ' + minRecarga + ' pesos.';
+            } else {
+                errorDiv.textContent = '';
+                closeModal('directvModal');
+
+                // Mostrar el resumen
+                const tarjeta = document.getElementById('tarjeta').value;
+                const costo = document.getElementById('costo').value;
+                const resumen = `Número de Tarjeta: ${tarjeta}<br>Monto a Recargar: ${monto} pesos<br>Costo: ${costo}`;
+                document.getElementById('resumen').innerHTML = resumen;
+
+                // Mostrar el modal de resumen
+                document.getElementById('summaryModal').style.display = 'flex';
+            }
+        }
+
+        // Función para procesar la recarga
+        function processRecarga() {
+            closeModal('summaryModal');
+            document.getElementById('whatsappModal').style.display = 'flex';
+        }
+
+        // Función para corregir los datos
+        function correctDatos() {
+            closeModal('summaryModal');
+            document.getElementById('directvModal').style.display = 'flex';
+        }
+
+        // Función para enviar el mensaje a través de WhatsApp
+        function sendWhatsAppMessage() {
+            const cedula = localStorage.getItem('cedula');
+            const correo = localStorage.getItem('correo');
+            const telefono = localStorage.getItem('telefono');
+            const tarjeta = document.getElementById('tarjeta').value;
+            const monto = document.getElementById('monto').value;
+            const costo = document.getElementById('costo').value;
+
+            const mensaje = `🆔 **Cédula**: ${cedula}\n📧 **Correo**: ${correo}\n📞 **Teléfono**: ${telefono}\n📺 **Servicio**: Directv\n💳 **Tarjeta**: ${tarjeta}\n💰 **Monto**: ${monto} pesos\n💵 **Costo**: ${costo}`;
+
+            const whatsappUrl = `https://wa.me/04147397648?text=${encodeURIComponent(mensaje)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Cerrar el modal si el usuario hace clic fuera de él
+        window.onclick = function(event) {
+            let initialModal = document.getElementById('initialModal');
+            let dataModal = document.getElementById('dataModal');
+            let serviceModal = document.getElementById('serviceModal');
+            let directvModal = document.getElementById('directvModal');
+            let summaryModal = document.getElementById('summaryModal');
+            let whatsappModal = document.getElementById('whatsappModal');
+            if (event.target == initialModal) {
+                initialModal.style.display = 'none';
+            }
+            if (event.target == dataModal) {
+                dataModal.style.display = 'none';
+            }
+            if (event.target == serviceModal) {
+                serviceModal.style.display = 'none';
+            }
+            if (event.target == directvModal) {
+                directvModal.style.display = 'none';
+            }
+            if (event.target == summaryModal) {
+                summaryModal.style.display = 'none';
+            }
+            if (event.target == whatsappModal) {
+                whatsappModal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
